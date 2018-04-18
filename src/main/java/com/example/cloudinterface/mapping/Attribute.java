@@ -6,20 +6,14 @@ public class Attribute {
 	
 	private String id;
     private String name;
-    private String nodeId;
     
-    public Attribute(String attributeName, String nodeId) {
+    public Attribute(String attributeName) {
     	id = UUID.randomUUID().toString();
     	this.name = attributeName;
-    	this.nodeId = nodeId;
     }
     
     public String getId() {
     	return id;
-    }
-    
-    public String getNodeId() {
-    	return nodeId;
     }
 
     public String getName() {

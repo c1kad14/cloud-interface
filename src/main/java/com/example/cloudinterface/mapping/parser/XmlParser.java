@@ -27,7 +27,7 @@ private LinkedList<Node> nodeList;
 		Node node = new Node(qName);
 		if (attributes != null && attributes.getLength() > 0) {
 			for (int i = 0; i < attributes.getLength(); i++) {
-				Attribute attribute = new Attribute(attributes.getQName(i), node.getId());
+				Attribute attribute = new Attribute(attributes.getQName(i));
 				node.getAttributes().add(attribute);
 			}
 		}
