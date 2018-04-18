@@ -68,7 +68,7 @@ public class XmlProcessor {
 			doc.set(entry.getKey(), entry.getValue());
 		}
 		String str = doc.read("$").toString();
-		System.out.println(str);
+		str = str.replaceAll("=", ":");
 		return new Gson().toJson(str);
 	}
 
