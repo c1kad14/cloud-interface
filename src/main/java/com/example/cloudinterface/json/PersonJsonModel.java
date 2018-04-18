@@ -4,7 +4,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-public class PersonJsonModelCreator implements JsonModelCreator {
+public class PersonJsonModel implements JsonModelCreator {
 	
 	public JsonObject createJsonObject() {
 		JsonObject personModel = Json.createObjectBuilder()

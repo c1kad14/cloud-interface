@@ -11,6 +11,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -18,21 +19,27 @@ import org.json.JSONObject;
 
 public class CloudApiClient {
 
-	private HttpClient httpClient;
-
-	public CloudApiClient() {
-		httpClient = HttpClients.createDefault();
-	}
-
 	public void doPost(String endpoint, String json) throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
 		HttpPost httpPost = new HttpPost("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/add");
 		httpPost.setHeader("Content-Type", "application/json");
 		httpPost.setHeader("Authorization", "Bearer " + getToken());
 		httpPost.setEntity(new StringEntity(json));
 		httpClient.execute(httpPost);
 	}
+	
+	public void doPut(String endpoint, String json) throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
+		HttpPut httpPut = new HttpPut("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/Update");
+		httpPut.setHeader("Content-Type", "application/json");
+		httpPut.setHeader("Authorization", "Bearer " + getToken());
+		httpPut.setEntity(new StringEntity(json));
+		httpClient.execute(httpPut);
+		
+	}
 
 	public String doGet(String endpoint, String id) throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/get?id=" + id);
 		httpGet.setHeader("Content-Type", "application/json");
 		httpGet.setHeader("Authorization", "Bearer " + getToken());
@@ -51,6 +58,7 @@ public class CloudApiClient {
 	}
 
 	public String doGet(String endpoint) throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/getlist");
 		httpGet.setHeader("Content-Type", "application/json");
 		httpGet.setHeader("Authorization", "Bearer " + getToken());
@@ -69,6 +77,7 @@ public class CloudApiClient {
 	}
 
 	private String getToken() throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
 		HttpPost postOauth = new HttpPost("http://interfacescosmosapi.azurewebsites.net/api/token");
 		postOauth.addHeader("content-type", "application/x-www-form-urlencoded");
 		List<NameValuePair> params = new ArrayList<NameValuePair>(2);

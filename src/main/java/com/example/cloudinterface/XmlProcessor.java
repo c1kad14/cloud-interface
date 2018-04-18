@@ -12,8 +12,10 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import com.example.cloudinterface.json.BookingJsonModel;
+import com.example.cloudinterface.json.InmateJsonModel;
 import com.example.cloudinterface.json.JsonModelCreator;
-import com.example.cloudinterface.json.PersonJsonModelCreator;
+import com.example.cloudinterface.json.PersonJsonModel;
 import com.example.cloudinterface.xml.parser.XmlParser;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
@@ -34,8 +36,14 @@ public class XmlProcessor {
 		JsonObject blankJson = null;
 		
 		switch(type) {
-			case "person" : 
-				model = new PersonJsonModelCreator();
+			case "persons" : 
+				model = new PersonJsonModel();
+				break;
+			case "inmates" :
+				model = new InmateJsonModel();
+				break;
+			case "bookings" :
+				model = new BookingJsonModel();
 				break;
 			default :
 				model = null;
@@ -62,8 +70,7 @@ public class XmlProcessor {
 		
 		HashMap<String, String> jsonValues = parser.getJsonValues();
 		
-		String s = blankJson.toString();
-		DocumentContext doc = JsonPath.parse(s);
+		DocumentContext doc = JsonPath.parse(blankJson.toString());
 		for (Entry<String, String> entry : jsonValues.entrySet()) {
 			doc.set(entry.getKey(), entry.getValue());
 		}
