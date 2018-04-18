@@ -4,6 +4,7 @@ import Mapping from './mapping';
 import Configuration from './configuration';
 import Connection from './connection';
 import AuditLog from './auditlog';
+import Interfaces from './interfaces';
 
 const panes = [
     {
@@ -39,7 +40,8 @@ class Main extends Component {
 
     render() {
         return <Container style={{height: "100%", width: "100%"}}>
-            <Tab style={{height: "100%"}} menu={{fluid: true, vertical: true, tabular: 'right'}} panes={panes}/>
+            <Interfaces />
+           {/*<Tab style={{height: "100%"}} menu={{fluid: true, vertical: true, tabular: 'right'}} panes={panes}/>*/}
         </Container>;
     }
 }
