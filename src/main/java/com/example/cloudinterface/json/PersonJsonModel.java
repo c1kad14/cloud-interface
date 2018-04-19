@@ -11,7 +11,7 @@ public class PersonJsonModel implements JsonModelCreator {
 				.add("first", JsonValue.NULL)
 				.add("last", JsonValue.NULL)
 				.add("middle", JsonValue.NULL)
-				.add("birthDate", JsonValue.NULL)
+				.add("birthdate", JsonValue.NULL)
 				.add("sex", JsonValue.NULL)
 				.build();
 		return personModel;

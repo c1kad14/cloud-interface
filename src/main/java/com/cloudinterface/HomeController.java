@@ -1,4 +1,3 @@
-/*
 package com.cloudinterface;
 
 import org.springframework.stereotype.Controller;
@@ -11,4 +10,4 @@ public class HomeController {
         return "index.html";
     }
 }
-*/
+

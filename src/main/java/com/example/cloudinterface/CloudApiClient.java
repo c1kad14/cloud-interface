@@ -38,7 +38,6 @@ public class CloudApiClient {
 		httpPut.setHeader("Authorization", "Bearer " + getToken());
 		httpPut.setEntity(new StringEntity(json));
 		httpClient.execute(httpPut);
-		
 	}
 
 	public String doGet(String endpoint, String id) {
@@ -72,26 +71,30 @@ public class CloudApiClient {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
 		return null;
 	}
 
-	public String doGet(String endpoint) throws Exception {
+	public String doGet(String endpoint) {
 		HttpClient httpClient = HttpClients.createDefault();
 		HttpGet httpGet = new HttpGet("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/getlist");
 		httpGet.setHeader("Content-Type", "application/json");
 		httpGet.setHeader("Authorization", "Bearer " + getToken());
-		HttpResponse resp = httpClient.execute(httpGet);
-		HttpEntity responseEntity = resp.getEntity();
-		if (responseEntity != null) {
-			InputStream in = responseEntity.getContent();
-			StringBuilder strBuilder = new StringBuilder();
-			int c;
-			while ((c = in.read()) != -1) {
-				strBuilder.append((char) c);
+		HttpResponse resp;
+		try {
+			resp = httpClient.execute(httpGet);
+			HttpEntity responseEntity = resp.getEntity();
+			if (responseEntity != null) {
+				InputStream in = responseEntity.getContent();
+				StringBuilder strBuilder = new StringBuilder();
+				int c;
+				while ((c = in.read()) != -1) {
+					strBuilder.append((char) c);
+				}
+				return strBuilder.toString();
 			}
-			return strBuilder.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
