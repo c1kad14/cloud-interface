@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import {Container, Header,  Divider, Input, Icon, Form, Label } from 'semantic-ui-react';
+import React, {Component} from 'react';
+import {Container, Header, Divider, Button, Input, Icon, Form, Label} from 'semantic-ui-react';
 import TextProperty from "../components/TextProperty";
+import axios from 'axios';
 
-class Configuration extends Component{
+class Configuration extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -14,6 +15,38 @@ class Configuration extends Component{
 
     }
 
+    openFileInput() {
+        this.fileInput.click();
+    }
+
+    fileChange(e) {
+        e.preventDefault();
+        let files = e.target.files;
+        let that = this;
+        if (files.length == 1) {
+            const file = files[0];
+            let reader = new FileReader();
+            reader.onloadend = function () {
+                if (this.readyState === FileReader.DONE) {
+                    const selectedFile = {src: reader.result, file: file};
+                    that.setState({fileSource: selectedFile.file});
+                }
+            }
+
+            reader.readAsDataURL(file);
+        }
+    }
+
+    parseXml() {
+        let formData = new FormData();
+        if (this.state.fileSource !== undefined) {
+            formData.set("file", this.state.fileSource);
+            formData.set("interfaceId", this.props.interfaceId);
+        }
+        const config = { headers: { 'content-type': 'multipart/form-data' } };
+        axios.post('/testxml', formData, config);
+    }
+
     render() {
         const that = this;
         return <Container>
@@ -21,14 +54,25 @@ class Configuration extends Component{
             <Container>
                 <Form>
                     <Form.Field>
+                        <Button onClick={this.openFileInput.bind(this)}><Icon name="file text"/></Button>
+                            <input
+                                ref={(input) => {
+                                    this.fileInput = input;
+                                }}
+                                style={{visibility: "hidden"}}
+                                type="file"
+                                onChange={(e) => this.fileChange(e)}/>
+                        <Button onClick={this.parseXml.bind(this)}>Parse test xml</Button>
                         <TextProperty icon="folder open"
                                       error="Please enter path to the pickup folder"
                                       placeholder="Import folder"
                                       value={this.state.importFolder}
-                                      onChange={(e) => {that.setState({importFolder: e.target.value})}}
+                                      onChange={(e) => {
+                                          that.setState({importFolder: e.target.value})
+                                      }}
                         />
                     </Form.Field>
-                    <Divider />
+                    <Divider/>
                 </Form>
             </Container>
         </Container>;

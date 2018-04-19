@@ -10,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import com.example.cloudinterface.json.InterfaceJsonModelCreator;
 import org.xml.sax.SAXException;
 
 import com.example.cloudinterface.json.JsonModelCreator;
@@ -34,7 +35,7 @@ public class XmlProcessor {
 		JsonObject blankJson = null;
 		
 		switch(type) {
-			case "person" : 
+			case "persons" :
 				model = new PersonJsonModelCreator();
 				break;
 			default :
