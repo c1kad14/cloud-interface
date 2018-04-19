@@ -21,4 +21,9 @@ public class InterfacesApiController {
     public String doGet() throws Exception {
         return client.doGet("interfaces");
     }
+
+    @DeleteMapping("delete")
+    public void doDelete(@RequestParam String id) {
+        client.doDelete("interfaces", id);
+    }
 }

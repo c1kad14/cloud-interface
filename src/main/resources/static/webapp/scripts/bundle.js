@@ -23715,6 +23715,7 @@
 	            token: ""
 	        };
 	        _this.addNewInterfaceClickHandler = _this.addNewInterfaceClickHandler.bind(_this);
+	        _this.deleteInterface = _this.deleteInterface.bind(_this);
 	        return _this;
 	    }
 
@@ -23745,8 +23746,18 @@
 	            }
 	        }
 	    }, {
+	        key: 'deleteInterface',
+	        value: function deleteInterface(id) {
+	            var that = this;
+	            _axios2.default.delete('api/interfaces/delete?id=' + id).then(function () {
+	                that.refreshData();
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this2 = this;
+
 	            var that = this;
 	            var interfaceList = this.state.interfaces.map(function (existingInterface) {
 	                return _react2.default.createElement(
@@ -23779,7 +23790,9 @@
 	                        { collapsing: true, textAlign: 'right' },
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Button,
-	                            null,
+	                            { onClick: function onClick() {
+	                                    return _this2.deleteInterface(existingInterface.id);
+	                                } },
 	                            _react2.default.createElement(_semanticUiReact.Icon, { name: 'delete' })
 	                        )
 	                    )
@@ -23798,7 +23811,6 @@
 	                            _semanticUiReact.Form.Field,
 	                            null,
 	                            _react2.default.createElement(_TextProperty2.default, { icon: 'folder open',
-	                                error: 'Please enter unique interface name',
 	                                placeholder: 'Add new interface',
 	                                value: this.state.interfaceToAddName,
 	                                onChange: function onChange(e) {
@@ -69774,6 +69786,8 @@
 	    value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _react = __webpack_require__(2);
@@ -69781,6 +69795,10 @@
 	var _react2 = _interopRequireDefault(_react);
 
 	var _semanticUiReact = __webpack_require__(69);
+
+	var _axios = __webpack_require__(793);
+
+	var _axios2 = _interopRequireDefault(_axios);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69790,6 +69808,46 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var schema = {
+	    "person": {
+	        "first": "$.first",
+	        "last": "$.last",
+	        "middle": "$.middle",
+	        "birthDate": "$.birthDate",
+	        "sex": "$.sex"
+	    },
+	    "inmate": {
+	        "agency": "$.agency",
+	        "assignedHousing": "$.inmate.assignedHousing",
+	        "currentBookingId": "$.inmate.currentBookingId",
+	        "person": {
+	            "id": "$.person.id",
+	            "first": "$.person.first",
+	            "last": "$.person.last",
+	            "middle": "$.person.middle",
+	            "birthDate": "$.person.birthDate",
+	            "sex": "$.person.sex"
+	        }
+	    },
+	    "booking": {
+	        "bookingAgency": "$.bookingAgency",
+	        "bookingType": "$.bookingType",
+	        "inmate": {
+	            "agency": "$.inmate.agency",
+	            "person": {
+	                "first": "$.inmate.person.first",
+	                "last": "$.inmate.person.last",
+	                "middle": "$.inmate.person.middle",
+	                "birthdate": "$.inmate.person.birthdate",
+	                "sex": "$.inmate.person.sex"
+	            },
+	            "assignedHousing": "$.inmate.assignedHousing",
+	            "currentBookingId": "$.inmate.currentBookingId"
+	        }
+	    }
+	};
+	var modelNames = ["person", "inmate", "booking"];
+
 	var Mapping = function (_Component) {
 	    _inherits(Mapping, _Component);
 
@@ -69798,8 +69856,15 @@
 
 	        var _this = _possibleConstructorReturn(this, (Mapping.__proto__ || Object.getPrototypeOf(Mapping)).call(this, props));
 
-	        _this.state = { activeIndex: 0 };
+	        _this.state = {
+	            activeIndex: 0,
+	            model: {}
+	        };
 	        _this.handleClick = _this.handleClick.bind(_this);
+	        _this.saveFieldMapping = _this.saveFieldMapping.bind(_this);
+	        _this.saveChildFieldMapping = _this.saveChildFieldMapping.bind(_this);
+	        _this.saveMapping = _this.saveMapping.bind(_this);
+
 	        return _this;
 	    }
 
@@ -69814,10 +69879,202 @@
 	            this.setState({ activeIndex: newIndex });
 	        }
 	    }, {
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            var that = this;
+	            _axios2.default.get("/api/mappings/getlist").then(function (response) {
+	                if (response.data !== undefined && response.data !== null && response.data !== []) {
+	                    var mappings = response.data.filter(function (mapping) {
+	                        return mapping.interfaceId === that.props.interfaceId;
+	                    });
+
+	                    var model = that.state.model;
+	                    for (var i = 0; i < mappings.length; i++) {
+	                        var mapping = mappings[i];
+	                        var elements = mapping.local.split('.');
+
+	                        if (elements.length > 2) {
+	                            if (model[elements[1]] === undefined) {
+	                                model[elements[1]] = {};
+	                            }
+	                            model[elements[1]][elements[2]] = mapping.remote;
+	                        } else {
+	                            model[elements[1]] = mapping.remote;
+	                        }
+	                    }
+
+	                    that.setState({});
+	                }
+	            });
+	        }
+	    }, {
+	        key: 'saveMapping',
+	        value: function saveMapping() {
+	            var that = this;
+	            var mappings = [];
+	            for (var key in this.state.model) {
+	                if (this.state.model.hasOwnProperty(key) && this.state.model[key] !== "") {
+	                    var modelToAdd = {};
+	                    if (_typeof(this.state.model[key]) !== "object") {
+	                        modelToAdd.local = schema[modelNames[this.state.activeIndex]][key];
+	                        modelToAdd.remote = this.state.model[key];
+	                        modelToAdd.interfaceId = this.props.interfaceId;
+	                        mappings.push(modelToAdd);
+	                    } else {
+	                        for (var childKey in this.state.model[key]) {
+	                            if (this.state.model[key].hasOwnProperty(childKey)) {
+	                                modelToAdd = {};
+	                                modelToAdd.local = schema[modelNames[this.state.activeIndex]][key][childKey];
+	                                modelToAdd.remote = this.state.model[key][childKey];
+	                                modelToAdd.interfaceId = this.props.interfaceId;
+	                                mappings.push(modelToAdd);
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	            mappings.map(function (mapping) {
+	                _axios2.default.post("/api/mappings/add", mapping).then(function (response) {});
+	            });
+	        }
+	    }, {
+	        key: 'saveFieldMapping',
+	        value: function saveFieldMapping(key, value) {
+	            this.state.model[key] = value;
+	            this.setState({});
+	        }
+	    }, {
+	        key: 'saveChildFieldMapping',
+	        value: function saveChildFieldMapping(key, childKey, value) {
+	            this.state.model[key][childKey] = value;
+	        }
+	    }, {
+	        key: 'getTableForModel',
+	        value: function getTableForModel(modelName) {
+	            var _this2 = this;
+
+	            var model = schema[modelName];
+	            var that = this;
+	            var tableBody = [];
+
+	            var _loop = function _loop(key) {
+	                if (model.hasOwnProperty(key)) {
+	                    if (_typeof(model[key]) !== "object") {
+	                        var row = _react2.default.createElement(
+	                            _semanticUiReact.Table.Row,
+	                            { key: key },
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.Cell,
+	                                null,
+	                                _react2.default.createElement(
+	                                    _semanticUiReact.Label,
+	                                    null,
+	                                    key
+	                                )
+	                            ),
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.Cell,
+	                                null,
+	                                _react2.default.createElement(_semanticUiReact.Input, { value: _this2.state.model[key], onChange: function onChange(e) {
+	                                        return that.saveFieldMapping(key, e.target.value);
+	                                    } })
+	                            )
+	                        );
+	                        tableBody.push(row);
+	                    } else {
+	                        tableBody.push(_react2.default.createElement(
+	                            _semanticUiReact.Table.Row,
+	                            { key: key },
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.HeaderCell,
+	                                { colSpan: '3' },
+	                                key
+	                            )
+	                        ));
+	                        if (_this2.state.model[key] === undefined) {
+	                            _this2.state.model[key] = {};
+	                        }
+
+	                        var _loop2 = function _loop2(childKey) {
+	                            if (model[key].hasOwnProperty(childKey)) {
+	                                var _row = _react2.default.createElement(
+	                                    _semanticUiReact.Table.Row,
+	                                    { key: childKey },
+	                                    _react2.default.createElement(
+	                                        _semanticUiReact.Table.Cell,
+	                                        null,
+	                                        _react2.default.createElement(
+	                                            _semanticUiReact.Label,
+	                                            null,
+	                                            childKey
+	                                        )
+	                                    ),
+	                                    _react2.default.createElement(
+	                                        _semanticUiReact.Table.Cell,
+	                                        null,
+	                                        _react2.default.createElement(_semanticUiReact.Input, { value: _this2.state.model[key] !== undefined ? _this2.state.model[key][childKey] : "", onChange: function onChange(e) {
+	                                                return that.saveChildFieldMapping(key, childKey, e.target.value);
+	                                            } })
+	                                    )
+	                                );
+	                                tableBody.push(_row);
+	                            }
+	                        };
+
+	                        for (var childKey in model[key]) {
+	                            _loop2(childKey);
+	                        }
+	                    }
+	                }
+	            };
+
+	            for (var key in model) {
+	                _loop(key);
+	            }
+
+	            return _react2.default.createElement(
+	                _semanticUiReact.Container,
+	                null,
+	                _react2.default.createElement(
+	                    _semanticUiReact.Table,
+	                    null,
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Header,
+	                        null,
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Table.Row,
+	                            null,
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.HeaderCell,
+	                                null,
+	                                'Model Field'
+	                            ),
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.HeaderCell,
+	                                null,
+	                                'XML Tag'
+	                            )
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Body,
+	                        null,
+	                        tableBody
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    _semanticUiReact.Button,
+	                    { onClick: this.saveMapping.bind(this) },
+	                    'Save'
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var activeIndex = this.state.activeIndex;
 
+	            var data = this.getTableForModel(modelNames[activeIndex]);
 	            return _react2.default.createElement(
 	                _semanticUiReact.Container,
 	                null,
@@ -69841,11 +70098,7 @@
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Accordion.Content,
 	                            { active: activeIndex === 0 },
-	                            _react2.default.createElement(
-	                                'p',
-	                                null,
-	                                'Person model schema here'
-	                            )
+	                            data
 	                        ),
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Accordion.Title,
@@ -69856,11 +70109,7 @@
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Accordion.Content,
 	                            { active: activeIndex === 1 },
-	                            _react2.default.createElement(
-	                                'p',
-	                                null,
-	                                'Inmate model schema here'
-	                            )
+	                            data
 	                        ),
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Accordion.Title,
@@ -69871,11 +70120,7 @@
 	                        _react2.default.createElement(
 	                            _semanticUiReact.Accordion.Content,
 	                            { active: activeIndex === 2 },
-	                            _react2.default.createElement(
-	                                'p',
-	                                null,
-	                                'Booking model schema here'
-	                            )
+	                            data
 	                        )
 	                    )
 	                )
@@ -69931,7 +70176,7 @@
 	        var _this = _possibleConstructorReturn(this, (Configuration.__proto__ || Object.getPrototypeOf(Configuration)).call(this, props));
 
 	        _this.state = {
-	            importFolder: ""
+	            fileMask: ""
 	        };
 	        return _this;
 	    }
@@ -70017,11 +70262,10 @@
 	                                'Parse test xml'
 	                            ),
 	                            _react2.default.createElement(_TextProperty2.default, { icon: 'folder open',
-	                                error: 'Please enter path to the pickup folder',
-	                                placeholder: 'Import folder',
-	                                value: this.state.importFolder,
+	                                placeholder: 'File mask',
+	                                value: this.state.fileMask,
 	                                onChange: function onChange(e) {
-	                                    that.setState({ importFolder: e.target.value });
+	                                    that.setState({ fileMask: e.target.value });
 	                                }
 	                            })
 	                        ),
@@ -70083,10 +70327,23 @@
 	                    { as: 'h3' },
 	                    'Connection'
 	                ),
+	                _react2.default.createElement(_semanticUiReact.Divider, null),
 	                _react2.default.createElement(
 	                    _semanticUiReact.Container,
 	                    null,
-	                    'Connection Content'
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Label,
+	                        null,
+	                        'Username: '
+	                    ),
+	                    _react2.default.createElement(_semanticUiReact.Input, { palceholder: 'api username' }),
+	                    _react2.default.createElement('br', null),
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Label,
+	                        null,
+	                        'Password: '
+	                    ),
+	                    _react2.default.createElement(_semanticUiReact.Input, { palceholder: 'api password' })
 	                )
 	            );
 	        }
@@ -70119,6 +70376,10 @@
 
 	var _TextProperty2 = _interopRequireDefault(_TextProperty);
 
+	var _index = __webpack_require__(793);
+
+	var _index2 = _interopRequireDefault(_index);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -70135,17 +70396,72 @@
 
 	        var _this = _possibleConstructorReturn(this, (AuditLog.__proto__ || Object.getPrototypeOf(AuditLog)).call(this, props));
 
-	        _this.state = {};
+	        _this.state = {
+	            logs: []
+	        };
 	        return _this;
 	    }
 
 	    _createClass(AuditLog, [{
+	        key: 'refreshData',
+	        value: function refreshData() {
+	            var that = this;
+	            _index2.default.get("/api/auditlogs/getlist").then(function (response) {
+	                that.setState({ logs: response.data });
+	            }).catch(function (error) {
+	                console.log('error ' + error);
+	            });
+	        }
+	    }, {
 	        key: 'componentWillMount',
-	        value: function componentWillMount() {}
+	        value: function componentWillMount() {
+	            this.refreshData();
+	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var that = this;
+	            var logs = this.state.logs.map(function (log) {
+	                return _react2.default.createElement(
+	                    _semanticUiReact.Table.Row,
+	                    { key: log.id },
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Cell,
+	                        { collapsing: true, textAlign: 'right' },
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Label,
+	                            null,
+	                            log.id
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Cell,
+	                        null,
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Label,
+	                            null,
+	                            log.name
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Cell,
+	                        null,
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Label,
+	                            null,
+	                            log.time
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table.Cell,
+	                        { collapsing: true, textAlign: 'right' },
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Label,
+	                            null,
+	                            log.status ? "Success" : "False"
+	                        )
+	                    )
+	                );
+	            });
 	            return _react2.default.createElement(
 	                _semanticUiReact.Container,
 	                null,
@@ -70154,7 +70470,47 @@
 	                    { as: 'h3' },
 	                    'Audit Log'
 	                ),
-	                _react2.default.createElement(_semanticUiReact.Container, null)
+	                _react2.default.createElement(
+	                    _semanticUiReact.Container,
+	                    null,
+	                    _react2.default.createElement(
+	                        _semanticUiReact.Table,
+	                        null,
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Table.Header,
+	                            null,
+	                            _react2.default.createElement(
+	                                _semanticUiReact.Table.Row,
+	                                null,
+	                                _react2.default.createElement(
+	                                    _semanticUiReact.Table.HeaderCell,
+	                                    null,
+	                                    'Id'
+	                                ),
+	                                _react2.default.createElement(
+	                                    _semanticUiReact.Table.HeaderCell,
+	                                    null,
+	                                    'Name'
+	                                ),
+	                                _react2.default.createElement(
+	                                    _semanticUiReact.Table.HeaderCell,
+	                                    null,
+	                                    'Time'
+	                                ),
+	                                _react2.default.createElement(
+	                                    _semanticUiReact.Table.HeaderCell,
+	                                    null,
+	                                    'Success'
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            _semanticUiReact.Table.Body,
+	                            null,
+	                            logs
+	                        )
+	                    )
+	                )
 	            );
 	        }
 	    }]);

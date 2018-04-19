@@ -14,6 +14,7 @@ class Interfaces extends Component {
             token: ""
         }
         this.addNewInterfaceClickHandler = this.addNewInterfaceClickHandler.bind(this);
+        this.deleteInterface = this.deleteInterface.bind(this);
     }
 
     refreshData() {
@@ -40,6 +41,13 @@ class Interfaces extends Component {
         }
     }
 
+    deleteInterface(id) {
+        const that = this;
+        axios.delete('api/interfaces/delete?id=' + id).then(() => {
+            that.refreshData();
+        });
+    }
+
 
     render() {
         const that = this;
@@ -52,7 +60,7 @@ class Interfaces extends Component {
                     <Link to={`/interface/${existingInterface.id}`}><Button><Icon name="edit"/></Button></Link>
                 </Table.Cell>
                 <Table.Cell collapsing textAlign='right'>
-                    <Button><Icon name="delete"/></Button></Table.Cell>
+                    <Button onClick={() => this.deleteInterface(existingInterface.id)}><Icon name="delete"/></Button></Table.Cell>
             </Table.Row>
         });
         return  <Container style={{height: "100%", width: "100%"}}>
@@ -60,7 +68,6 @@ class Interfaces extends Component {
                 <Form>
                     <Form.Field>
                         <TextProperty icon="folder open"
-                                      error="Please enter unique interface name"
                                       placeholder="Add new interface"
                                       value={this.state.interfaceToAddName}
                                       onChange={(e) => {
