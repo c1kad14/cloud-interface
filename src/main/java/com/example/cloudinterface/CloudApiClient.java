@@ -15,6 +15,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -29,6 +30,16 @@ public class CloudApiClient {
 		httpPost.setHeader("Authorization", "Bearer " + getToken());
 		httpPost.setEntity(new StringEntity(json));
 		httpClient.execute(httpPost);
+	}
+	
+	public void doPut(String endpoint, String json) throws Exception {
+		HttpClient httpClient = HttpClients.createDefault();
+		HttpPut httpPut = new HttpPut("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/Update");
+		httpPut.setHeader("Content-Type", "application/json");
+		httpPut.setHeader("Authorization", "Bearer " + getToken());
+		httpPut.setEntity(new StringEntity(json));
+		httpClient.execute(httpPut);
+		
 	}
 
 	public String doGet(String endpoint, String id) {
