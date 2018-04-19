@@ -1,11 +1,18 @@
 package com.cloudinterface.lift;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
+
+import com.example.cloudinterface.XmlProcessor;
 
 public class InterfaceServerEndpoint implements WebSocketHandler {
 
@@ -15,7 +22,7 @@ public class InterfaceServerEndpoint implements WebSocketHandler {
 		log.debug("Opened session for: {}", session.getId());
 	}
 
-	@Override public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+	@Override public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) {
 		Object payload = message.getPayload();
 		if (payload instanceof String) {
 			String stringMessage = (String) payload;
@@ -25,6 +32,24 @@ public class InterfaceServerEndpoint implements WebSocketHandler {
 			else {
 				// process incoming message here
 				log.debug("Received file content: {}", stringMessage);
+				XmlProcessor processor = new XmlProcessor();
+				File f = new File("/home/alex/temp.xml");
+				BufferedWriter out = null;
+				try {
+					out = new BufferedWriter(new FileWriter(f));
+					out.write(stringMessage);
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				finally {
+					try {
+						out.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				processor.process(f);
 			}
 		}
 		else {

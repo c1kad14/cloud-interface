@@ -12,9 +12,11 @@ import com.example.cloudinterface.mapping.Node;
 public class XmlParser extends DefaultHandler {
 	
 private LinkedList<Node> nodeList;
+private String parentId;
 	
 	public XmlParser() {
 		nodeList = new LinkedList<Node>();
+		parentId = null;
 	}
 	
 	public LinkedList<Node> getNodes() {
@@ -32,14 +34,25 @@ private LinkedList<Node> nodeList;
 			}
 		}
 		
-		if (nodeList.peekLast() != null) {
-			node.setParentId(nodeList.peekLast().getId());
-		}
-		else {
-			node.setParentId(null);
-		}
+		node.setParentId(parentId);
+		parentId = node.getId();
+		
+//		if (nodeList.peekLast() != null) {
+//			node.setParentId(nodeList.peekLast().getId());
+//		}
+//		else {
+//			node.setParentId(null);
+//		}
 		
 		nodeList.addLast(node);
+	}
+	
+	@Override
+	public void endElement (String uri, String localName, String qName)
+	        throws SAXException {
+		if (nodeList.size() > 1) {
+			parentId = nodeList.get(nodeList.size() - 2).getId();
+		}
 	}
 
 }

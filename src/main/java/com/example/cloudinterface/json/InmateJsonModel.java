@@ -10,6 +10,7 @@ public class InmateJsonModel implements JsonModelCreator {
 		JsonObject inmateModel = Json.createObjectBuilder()
 				.add("agency", JsonValue.NULL)
 				.add("person", Json.createObjectBuilder()
+						.add("id", JsonValue.NULL)
 						.add("first", JsonValue.NULL)
 						.add("last", JsonValue.NULL)
 						.add("middle", JsonValue.NULL)
