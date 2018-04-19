@@ -8,10 +8,11 @@ import javax.json.JsonValue;
 
 public class NodeJsonCreator {
 	
-	public String creteJson(Node node) {
+	public String creteJson(Node node, String interfaceId) {
 		JsonObjectBuilder nodeJsonBuilder = Json.createObjectBuilder()
 		.add("id", node.getId())
 		.add("name", node.getName())
+		.add("interfaceId", interfaceId)
 		.add("parentId", (node.getParentId() != null ? node.getParentId() : JsonValue.NULL.toString()));
 		
 		JsonArrayBuilder attrArrayBuilder = Json.createArrayBuilder();
