@@ -12,6 +12,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -83,6 +84,24 @@ public class CloudApiClient {
 			return strBuilder.toString();
 		}
 		return null;
+	}
+
+	public void doDelete(String endpoint, String id) {
+		HttpClient httpClient = HttpClients.createDefault();
+		HttpDelete httpDelete = new HttpDelete("http://interfacescosmosapi.azurewebsites.net/api/" + endpoint + "/delete?id=" + id);
+		httpDelete.setHeader("Content-Type", "application/json");
+		try {
+			httpDelete.setHeader("Authorization", "Bearer " + getToken());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		HttpResponse resp = null;
+		try {
+			resp = httpClient.execute(httpDelete);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		resp.getEntity();
 	}
 
 	private String getToken() {

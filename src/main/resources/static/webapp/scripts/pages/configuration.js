@@ -7,7 +7,7 @@ class Configuration extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            importFolder: ""
+            fileMask: ""
         }
     }
 
@@ -64,11 +64,10 @@ class Configuration extends Component {
                                 onChange={(e) => this.fileChange(e)}/>
                         <Button onClick={this.parseXml.bind(this)}>Parse test xml</Button>
                         <TextProperty icon="folder open"
-                                      error="Please enter path to the pickup folder"
-                                      placeholder="Import folder"
-                                      value={this.state.importFolder}
+                                      placeholder="File mask"
+                                      value={this.state.fileMask}
                                       onChange={(e) => {
-                                          that.setState({importFolder: e.target.value})
+                                          that.setState({fileMask: e.target.value})
                                       }}
                         />
                     </Form.Field>
