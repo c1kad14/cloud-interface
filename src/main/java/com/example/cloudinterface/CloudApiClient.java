@@ -44,8 +44,10 @@ public class CloudApiClient {
 		httpPost.setHeader("Authorization", "Bearer " + getToken());
 		httpPost.setEntity(new StringEntity(json));
 		HttpResponse response = httpClient.execute(httpPost);
-		
-		String requestUri = httpPost.getRequestLine().toString();
+
+
+		String requestUri = httpPost.getRequestLine().toString() +
+				"\\n" + response.getStatusLine().getReasonPhrase();
 		int responseCode = response.getStatusLine().getStatusCode();
 		String responseTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		String auditJson = createAuditJson(responseTime, requestUri, (responseCode == 200 ? true : false));

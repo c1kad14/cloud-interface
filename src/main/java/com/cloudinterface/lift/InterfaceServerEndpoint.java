@@ -33,7 +33,7 @@ public class InterfaceServerEndpoint implements WebSocketHandler {
 				// process incoming message here
 				log.debug("Received file content: {}", stringMessage);
 				XmlProcessor processor = new XmlProcessor();
-				File f = new File("/home/alex/temp.xml");
+				File f = new File("temp.xml");
 				BufferedWriter out = null;
 				try {
 					out = new BufferedWriter(new FileWriter(f));

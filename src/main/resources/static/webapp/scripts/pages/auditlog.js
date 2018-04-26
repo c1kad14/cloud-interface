@@ -28,7 +28,7 @@ class AuditLog extends Component{
     render() {
         const logs = this.state.logs.map((log) => {
             return <Table.Row key={log.id}>
-                <Table.Cell collapsing textAlign='right'>
+                <Table.Cell>
                     <Label>{log.id}</Label>
                 </Table.Cell>
                 <Table.Cell>
@@ -37,15 +37,15 @@ class AuditLog extends Component{
                 <Table.Cell>
                     <Label>{log.time}</Label>
                 </Table.Cell>
-                <Table.Cell collapsing textAlign='right'>
+                <Table.Cell>
                     <Label>{log.status ? "Success" : "False"}</Label>
                 </Table.Cell>
             </Table.Row>
         });
-        return <Container>
+        return <Container style={{width: "100%"}}>
             <Header as='h3'>Audit Log</Header>
-            <Container>
-                <Table>
+            <Container style={{width: "100%"}}>
+                <Table style={{width: "100%"}}>
                     <Table.Header>
                         <Table.Row>
                             <Table.HeaderCell>Id</Table.HeaderCell>

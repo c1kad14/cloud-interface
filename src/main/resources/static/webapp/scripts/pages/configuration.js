@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Container, Header, Divider, Button, Input, Icon, Form, Label} from 'semantic-ui-react';
-import TextProperty from "../components/TextProperty";
+import {Container, Header, Divider, Button, Input, Icon, Form} from 'semantic-ui-react';
+
 import axios from 'axios';
 
 class Configuration extends Component {
@@ -54,17 +54,17 @@ class Configuration extends Component {
             <Container>
                 <Form>
                     <Form.Field>
-                        <Button onClick={this.openFileInput.bind(this)}><Icon name="file text"/></Button>
-                            <input
+                        <Button style={{width: "25%"}} onClick={this.openFileInput.bind(this)}><Icon name="file text"/></Button>
+
+                        <Button style={{width: "25%"}} onClick={this.parseXml.bind(this)}>Parse test xml</Button>
+                        <input
                                 ref={(input) => {
                                     this.fileInput = input;
                                 }}
                                 style={{visibility: "hidden"}}
                                 type="file"
                                 onChange={(e) => this.fileChange(e)}/>
-                        <Button onClick={this.parseXml.bind(this)}>Parse test xml</Button>
-                        <TextProperty icon="folder open"
-                                      placeholder="File mask"
+                        <Input placeholder="File mask"
                                       value={this.state.fileMask}
                                       onChange={(e) => {
                                           that.setState({fileMask: e.target.value})

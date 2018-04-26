@@ -12,8 +12,8 @@ const schema = {
     },
     "inmate": {
         "agency": "$.agency",
-        "assignedHousing": "$.inmate.assignedHousing",
-        "currentBookingId": "$.inmate.currentBookingId",
+        "assignedHousing": "$.assignedHousing",
+        "currentBookingId": "$.currentBookingId",
         "person": {
             "id": "$.person.id",
             "first": "$.person.first",

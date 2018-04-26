@@ -53,7 +53,7 @@ class Properties extends Component {
             }
         ];
 
-        return <Container style={{height: "100%", width: "100%"}}>
+        return <Container style={{height: "100%", width: "70%"}}>
             <Header>{this.props.interface}</Header>
             {<Tab style={{height: "100%"}} menu={{fluid: true, vertical: true, tabular: 'right'}} panes={panes}/>}
         </Container>;
